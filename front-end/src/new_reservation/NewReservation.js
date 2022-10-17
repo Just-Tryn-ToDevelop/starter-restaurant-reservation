@@ -19,34 +19,35 @@ function NewReservation() {
     history.go(-1);
   }
 
-  function changeHandler({target: {name, value}}) {
-      setFormData((preFormData) => ({
-          ...preFormData, [name]: value
-        }))
-        if (name === "mobile_number") {
-          if (value.length === 3 || value.length === 7) {
-            value = value + "-"
-          }
-        }
+  function changeHandler({ target: { name, value } }) {
+    setFormData((preFormData) => ({
+      ...preFormData,
+      [name]: value,
+    }));
+    if (name === "mobile_number") {
+      if (value.length === 3 || value.length === 7) {
+        value = value + "-";
+      }
     }
+  }
 
   function submitHandler(event) {
     event.preventDefault();
     createReservation(formData)
       .then(() => {
-       history.push(`/dashboard?date=${formData.reservation_date}`)
+        history.push(`/dashboard?date=${formData.reservation_date}`);
       })
       .catch(setCreateError);
-    }
-    
-// console.log(formData)
+  }
+
+  // console.log(formData)
   return (
     <>
       <div className="pl-3">
         <h1>Create Reservation</h1>
       </div>
       <ErrorAlert error={createError} />
-      <form onSubmit={submitHandler} className="w-25 p-3" >
+      <form onSubmit={submitHandler} className="w-25 p-3">
         <div className="form-group">
           <label>First Name</label>
           <input
@@ -76,8 +77,8 @@ function NewReservation() {
         <div className="form-group">
           <label>Mobile Number</label>
           <input
-          type="text"
-          className="form-control"
+            type="text"
+            className="form-control"
             name="mobile_number"
             value={formData.mobile_number}
             onChange={changeHandler}
@@ -89,12 +90,13 @@ function NewReservation() {
           <label>Reservation Date</label>
           <input
             type="date"
+            pattern="\d{4}-\d{2}-\d{2}"
             className="form-control"
             name="reservation_date"
             id="date"
             value={formData.reservation_date}
             onChange={changeHandler}
-            placeholder="Date"
+            placeholder="YYYY-MM-DD"
             required={true}
           />
         </div>
@@ -102,12 +104,13 @@ function NewReservation() {
           <label>Reservation Time</label>
           <input
             type="time"
+            pattern="[0-9]{2}:[0-9]{2}"
             className="form-control"
             name="reservation_time"
             id="time"
             value={formData.reservation_time}
             onChange={changeHandler}
-            placeholder="Time"
+            placeholder="HH:MM"
             required={true}
           />
         </div>
@@ -126,12 +129,16 @@ function NewReservation() {
           />
         </div>
         <div>
-            <button type="submit" className="btn btn-success mr-1">
-              Submit
-            </button>
-            <button onClick={cancelHandler} type="button" className="btn btn-danger mr-1">
-              Cancel
-            </button>
+          <button type="submit" className="btn btn-success mr-1">
+            Submit
+          </button>
+          <button
+            onClick={cancelHandler}
+            type="button"
+            className="btn btn-danger mr-1"
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </>
