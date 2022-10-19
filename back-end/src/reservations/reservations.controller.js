@@ -13,21 +13,34 @@ const hasRequiredPorperties = hasProperties(
   "people"
 );
 
+function validateDate(req, res, next) {
+  const date = req.body.data.reservation_date;
+  const pattern = /^\d{4}[- ]?\d{2}[- ]?\d{2}$/;
+  console.log(date.match(pattern))
+  if (date.match(pattern)) {
+    return next();
+  }
+  next({
+    status: 400,
+    message: "Please enter a valid date.",
+  });
+}
+
 function validatePhoneNUmber(req, res, next) {
   const phoneNumber = req.body.data.mobile_number;
-  const pattern = /^\(?([0-9]{3})\)?[- ]?([0-9]{3})[- ]?([0-9]{4})$/
+  const pattern = /^\(?([0-9]{3})\)?[- ]?([0-9]{3})[- ]?([0-9]{4})$/;
   if (phoneNumber.match(pattern)) {
     return next();
   }
   next({
     status: 400,
-    message: "Phone number is either too long, too short, or has letters. Please enter a valid phone number.",
+    message: "Please enter a valid phone number.",
   });
 }
 
 function hasEnoughInParty(req, res, next) {
   const partyAmount = Number(req.body.data.people);
-  if (partyAmount > 0) {
+  if (partyAmount > 0 && Number.isInteger(partyAmount)) {
     return next();
   }
   next({
@@ -49,5 +62,11 @@ async function create(req, res, next) {
 
 module.exports = {
   list: asyncErrorBoundary(list),
-  create: [hasRequiredPorperties, hasEnoughInParty, validatePhoneNUmber, asyncErrorBoundary(create)],
+  create: [
+    hasRequiredPorperties,
+    hasEnoughInParty,
+    validatePhoneNUmber,
+    validateDate,
+    asyncErrorBoundary(create),
+  ],
 };
