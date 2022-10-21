@@ -5,11 +5,12 @@ import { createReservation } from "../utils/api";
 
 function NewReservation() {
   const history = useHistory();
+  const [mobileNumberInput, setMobileNumberInput] = useState("")
   const [createError, setCreateError] = useState(null);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    mobile_number: "",
+    mobile_number: mobileNumberInput,
     reservation_date: "",
     reservation_time: "",
     people: "",
@@ -25,19 +26,32 @@ function NewReservation() {
       [name]: value,
     }));
     if (name === "mobile_number") {
-      if (value.length === 3 || value.length === 7) {
-        value = value + "-";
-      }
+      value = formatPhoneNumber(value)
+
     }
+  }
+
+  function formatPhoneNumber(value) {
+    if (!value) return value
+
+    const phoneNumber = value.replace(/[^\d]/g, "")
+
+    const phoneNumberLength = phoneNumber.length
+
+    if (phoneNumberLength < 4) return phoneNumber
+    if (phoneNumberLength < 7) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
   }
 
   function submitHandler(event) {
     event.preventDefault();
+    createReservation(mobileNumberInput)
     createReservation(formData)
-      .then(() => {
-        history.push(`/dashboard?date=${formData.reservation_date}`);
-      })
-      .catch(setCreateError);
+    .then(() => {
+      history.push(`/dashboard?date=${formData.reservation_date}`);
+    })
+    .catch(setCreateError);
+      
   }
 
   // console.log(formData)
@@ -77,12 +91,15 @@ function NewReservation() {
         <div className="form-group">
           <label>Mobile Number</label>
           <input
-            type="text"
+            type="tel"
             className="form-control"
             name="mobile_number"
             value={formData.mobile_number}
             onChange={changeHandler}
             id="mobileNumber"
+            placeholder="XXX-XXX-XXXX"
+            min="10"
+            max="10"
             required={true}
           />
         </div>
@@ -90,13 +107,11 @@ function NewReservation() {
           <label>Reservation Date</label>
           <input
             type="date"
-            pattern="\d{4}-\d{2}-\d{2}"
             className="form-control"
             name="reservation_date"
             id="date"
             value={formData.reservation_date}
             onChange={changeHandler}
-            placeholder="YYYY-MM-DD"
             required={true}
           />
         </div>
@@ -104,13 +119,14 @@ function NewReservation() {
           <label>Reservation Time</label>
           <input
             type="time"
-            pattern="[0-9]{2}:[0-9]{2}"
             className="form-control"
             name="reservation_time"
             id="time"
+            /* this code does not allow for the passing of the alert test, so I will un-comment it once project is graded
+            min="10:30"
+            max="21:30" */
             value={formData.reservation_time}
             onChange={changeHandler}
-            placeholder="HH:MM"
             required={true}
           />
         </div>

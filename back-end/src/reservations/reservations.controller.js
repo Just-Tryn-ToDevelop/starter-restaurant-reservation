@@ -16,20 +16,76 @@ const hasRequiredPorperties = hasProperties(
 function validateDate(req, res, next) {
   const date = req.body.data.reservation_date;
   const pattern = /^\d{4}[- ]?\d{2}[- ]?\d{2}$/;
-  console.log(date.match(pattern))
   if (date.match(pattern)) {
+    return next();
+  }
+
+  next({
+    status: 400,
+    message: "Please enter a valid reservation_date.",
+  });
+}
+
+function validDayOfWeek(req, res, next) {
+  const date = req.body.data.reservation_date;
+  const time = req.body.data.reservation_time
+  const day = new Date(`${date} ${time}`)
+  if (day.getDay() !== 2) {
+    return next()
+  }
+  next({
+    status: 400,
+    message: "We are closed on Tuesdays. Please choose another day.",
+  })
+}
+
+function notInThePast(req, res, next) {
+  const date = req.body.data.reservation_date;
+  const time = req.body.data.reservation_time
+  const resDate = new Date(`${date} ${time}`)
+  const today = Date.now()
+  if (resDate.valueOf() > today.valueOf()) {
+    return next()
+  }
+  next({
+    status: 400,
+    message: "Reservation must be for a future date.",
+  })
+}
+
+function validateTime(req, res, next) {
+  const time = req.body.data.reservation_time;
+  const pattern = /^\d{2}:\d{2}$/;
+  if (time.match(pattern)) {
     return next();
   }
   next({
     status: 400,
-    message: "Please enter a valid date.",
+    message: "Please enter a valid reservation_time.",
+  });
+}
+
+function validHours(req, res, next) {
+  const time = req.body.data.reservation_time;
+  const date = req.body.data.reservation_date
+  const reservationDate = new Date(`${date} ${time}`)
+const open = new Date(`${date} 10:30`)
+const close = new Date(`${date} 21:30`)
+
+if (reservationDate.getTime() >= open.getTime() && reservationDate.getTime() <= close.getTime()) {
+    return next();
+  }
+  next({
+    status: 400,
+    message: "Please enter a reservation_time that is during our business hours, 10:30 AM - 9:30 PM. Thank you!",
   });
 }
 
 function validatePhoneNUmber(req, res, next) {
-  const phoneNumber = req.body.data.mobile_number;
-  const pattern = /^\(?([0-9]{3})\)?[- ]?([0-9]{3})[- ]?([0-9]{4})$/;
+  let phoneNumber = req.body.data.mobile_number;
+  const pattern = /^([0-9]{3})[-]?([0-9]{3})[-]?([0-9]{4})$/;
   if (phoneNumber.match(pattern)) {
+    phoneNumber = `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
     return next();
   }
   next({
@@ -38,14 +94,14 @@ function validatePhoneNUmber(req, res, next) {
   });
 }
 
-function hasEnoughInParty(req, res, next) {
+function validatePeople(req, res, next) {
   const partyAmount = Number(req.body.data.people);
-  if (partyAmount > 0 && Number.isInteger(partyAmount)) {
+  if (partyAmount && partyAmount > 0 && Number.isInteger(partyAmount)) {
     return next();
   }
   next({
     status: 400,
-    message: "Amount of people in party must be more than 0",
+    message: "Please enter a valid value for people",
   });
 }
 
@@ -64,9 +120,13 @@ module.exports = {
   list: asyncErrorBoundary(list),
   create: [
     hasRequiredPorperties,
-    hasEnoughInParty,
+    validatePeople,
     validatePhoneNUmber,
     validateDate,
+    validateTime,
+    validDayOfWeek,
+    notInThePast,
+    validHours,
     asyncErrorBoundary(create),
   ],
 };

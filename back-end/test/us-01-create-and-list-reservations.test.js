@@ -366,21 +366,21 @@ describe("US-01 - Create and list reservations", () => {
   describe("GET /reservations", () => {
     test("returns only reservations matching date query parameter", async () => {
       const response = await request(app)
-        .get("/reservations?date=2020-12-31")
+        .get("/reservations?date=2022-10-15")
         .set("Accept", "application/json");
 
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.data[0].first_name).toBe("Rick");
+      expect(response.body.data[0].first_name).toBe("Tiger");
       expect(response.status).toBe(200);
     });
     test("returns reservations sorted by time (earliest time first)", async () => {
       const response = await request(app)
-        .get("/reservations?date=2020-12-30")
+        .get("/reservations?date=2022-10-16")
         .set("Accept", "application/json");
 
-      expect(response.body.data).toHaveLength(2);
+      expect(response.body.data).toHaveLength(3);
       expect(response.body.data[0].first_name).toBe("Bird");
-      expect(response.body.data[1].first_name).toBe("Frank");
+      expect(response.body.data[1].first_name).toBe("Rick");
       expect(response.status).toBe(200);
     });
   });
