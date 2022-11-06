@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ErrorAlert from "../layout/ErrorAlert";
-import { useHistory } from "react-router-dom";
-import { createReservation } from "../utils/api";
+import { useHistory, useParams } from "react-router-dom";
+import { editReservation, readReservation } from "../utils/api";
 import ReservationForm from "../layout/ReservationForm";
 
-function NewReservation() {
-  const history = useHistory();
-  const [createError, setCreateError] = useState(null);
+function EditReservation() {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -15,6 +13,17 @@ function NewReservation() {
     reservation_time: "",
     people: "",
   });
+  const [createError, setCreateError] = useState(null);
+  const { reservation_id } = useParams();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (!reservation_id) return;
+    const abortController = new AbortController();
+    readReservation(reservation_id, abortController.signal).then(setFormData);
+    return () => abortController.abort();
+  }, [reservation_id]);
+
   function cancelHandler() {
     history.go(-1);
   }
@@ -23,7 +32,6 @@ function NewReservation() {
     setFormData((preFormData) => ({
       ...preFormData,
       [name]: value,
-      status: "booked",
     }));
     if (name === "mobile_number") {
       value = formatPhoneNumber(value);
@@ -47,28 +55,27 @@ function NewReservation() {
     )}-${phoneNumber.slice(6, 10)}`;
   }
 
-  function submitHandler(event) {
+  async function submitHandler(event) {
     event.preventDefault();
-    createReservation(formData)
+    await editReservation(formData)
       .then(() => {
         history.push(`/dashboard?date=${formData.reservation_date}`);
       })
       .catch(setCreateError);
   }
+
   return (
     <>
-      <div className="pl-3 ">
-        <h1>Create Reservation</h1>
-      </div>
       <ErrorAlert error={createError} />
       <ReservationForm
-        formData={formData}
-        createSubmitHandler={submitHandler}
-        changeHandler={changeHandler}
+        editSubmitHandler={submitHandler}
         cancelHandler={cancelHandler}
+        changeHandler={changeHandler}
+        formData={formData}
+        resId={reservation_id}
       />
     </>
   );
 }
 
-export default NewReservation;
+export default EditReservation;

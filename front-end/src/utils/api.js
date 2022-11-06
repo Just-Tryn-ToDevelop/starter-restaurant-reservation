@@ -3,11 +3,13 @@
  * The default values is overridden by the `API_BASE_URL` environment variable.
  */
 import formatReservationDate from "./format-reservation-date";
-import formatReservationTime from "./format-reservation-date";
+import formatReservationTime from "./format-reservation-time";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://restaurant-app-capstone-back.herokuapp.com"
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL ||
+  "https://restaurant-app-capstone-back.herokuapp.com";
 
-  // 
+//
 
 /**
  * Defines the default headers for these functions to work with `json-server`
@@ -78,4 +80,97 @@ export async function createReservation(reservation, signal) {
     signal,
   };
   return await fetchJson(url, options);
+}
+
+export async function createTable(table, signal) {
+  const url = `${API_BASE_URL}/tables`;
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ data: table }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+export async function listTables(signal) {
+  const url = `${API_BASE_URL}/tables`;
+  const options = {
+    headers,
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+export async function updateTable(
+  { table_id, reservation_id, capacity },
+  signal
+) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      data: {
+        reservation_id: reservation_id,
+        capacity: capacity,
+        table_id: table_id,
+      },
+    }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+export async function updateReservation({ reservation_id, status }, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      data: {
+        reservation_id: reservation_id,
+        status: status,
+      },
+    }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+export async function editReservation(reservation, signal) {
+  const { reservation_id } = reservation;
+  const url = `${API_BASE_URL}/reservations/${reservation_id}`;
+  const data = {
+    ...reservation,
+    reservation_id: reservation_id,
+    // reservation_date: Array.isArray(reservation_date)
+    //   ? reservation_date[0]
+    //   : reservation_date,
+    // reservation_time: Array.isArray(reservation_time)
+    //   ? reservation_time[0]
+    //   : reservation_time,
+  };
+
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data }),
+    signal,
+  };
+  return await fetchJson(url, options);
+  // return Array.isArray(response) ? response[0] : response;
+}
+
+export async function deleteTable(table_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = { method: "DELETE", signal };
+  return await fetchJson(url, options);
+}
+
+export async function readReservation(reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}`;
+  return await fetchJson(url, { signal }, {})
+    .then(formatReservationDate)
+    .then(formatReservationTime);
 }

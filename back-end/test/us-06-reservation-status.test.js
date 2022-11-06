@@ -174,6 +174,7 @@ describe("US-06 - Reservation status", () => {
     });
 
     test("returns 400 if reservation is already 'seated'", async () => {
+      console.log("111111")
       expect(tableOne).not.toBeUndefined();
       expect(reservationOne).not.toBeUndefined();
 

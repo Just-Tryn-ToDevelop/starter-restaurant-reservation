@@ -5,6 +5,10 @@ import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
 import NewReservation from "../new_reservation/NewReservation"
+import Seat from "../tables/Seat"
+import CreateTable from "../tables/CreateTable"
+import NumberSearch from "../dashboard/NumberSearch"
+import EditReservation from "../dashboard/EditReservation";
 
 /**
  * Defines all the routes for the application.
@@ -23,10 +27,25 @@ function Routes() {
         <Redirect to={"/dashboard"} />
       </Route>
       <Route path="/reservations/new">
-        <NewReservation/>
+        <NewReservation />
+      </Route>
+      <Route path="/reservations/:reservation_id/seat">
+        <Seat />
+      </Route>
+      <Route path="/reservations/:reservation_id/edit">
+        <EditReservation />
       </Route>
       <Route path="/dashboard">
         <Dashboard date={today()} />
+      </Route>
+      <Route exact={true} path="/tables">
+        <Redirect to={"/dashboard"} />
+      </Route>
+      <Route path="/tables/new">
+        <CreateTable />
+      </Route>
+      <Route exact={true} path="/search">
+        <NumberSearch />
       </Route>
       <Route>
         <NotFound />

@@ -2,3 +2,52 @@
   background-color: #393a44;
   min-width: 200px;
 }
+
+table {
+  font-size: auto;
+}
+
+table thead {
+  background-color: #3d7358;
+  margin-right: 0;
+  text-align: center;
+}
+
+#dashboardHeader {
+  display: flex;
+}
+
+#buttons {
+  text-align: right;
+}
+
+@media all and (min-width: 992px) {
+  #showReservations,
+  #showTables {
+    display: none;
+  }
+  #reservations,
+  #tables {
+    display: block;
+  }
+
+  #dashDate {
+    display: none;
+  }
+}
+
+@media all and (max-width: 767px) {
+  #buttons {
+    text-align: center;
+  }
+
+  #dashDate {
+    text-align: right;
+  }
+}
+
+@media all and (max-width: 575px) {
+  #dashDate {
+    text-align: center;
+  }
+}
