@@ -92,7 +92,7 @@ function ListTables({ reservations, setReservations, date }) {
               <th></th>
             </tr>
           </thead>
-          <tbody>{tablesList}</tbody>
+          <tbody className="text-center">{tablesList}</tbody>
         </table>
         <ErrorAlert error={tablesError} />
       </div>

@@ -169,7 +169,7 @@ console.log(reservations)
                     <th></th>
                   </tr>
                 </thead>
-                <tbody>{resList}</tbody>
+                <tbody className="text-center">{resList}</tbody>
               </table>
             )}
           </div>
