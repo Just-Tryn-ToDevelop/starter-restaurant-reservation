@@ -144,12 +144,6 @@ export async function editReservation(reservation, signal) {
   const data = {
     ...reservation,
     reservation_id: reservation_id,
-    // reservation_date: Array.isArray(reservation_date)
-    //   ? reservation_date[0]
-    //   : reservation_date,
-    // reservation_time: Array.isArray(reservation_time)
-    //   ? reservation_time[0]
-    //   : reservation_time,
   };
 
   const options = {
@@ -159,7 +153,6 @@ export async function editReservation(reservation, signal) {
     signal,
   };
   return await fetchJson(url, options);
-  // return Array.isArray(response) ? response[0] : response;
 }
 
 export async function deleteTable(table_id, signal) {
