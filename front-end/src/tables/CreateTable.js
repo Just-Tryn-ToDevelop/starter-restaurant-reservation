@@ -16,16 +16,17 @@ function CreateTable() {
       ...preFormData,
       [name]: value,
     }));
-    if (name === "capacity") value = Number(value)
+    if (name === "capacity") value = Number(value);
   }
 
-  function submitHandler(event) {
+  async function submitHandler(event) {
     event.preventDefault();
-    createTable(formData)
-      .then(() => {
-        history.push(`/dashboard`);
-      })
-      .catch(setCreateError);
+    try {
+      await createTable(formData);
+      await history.push(`/dashboard`);
+    } catch (error) {
+      setCreateError(error);
+    }
   }
   return (
     <>

@@ -132,6 +132,7 @@ describe("US-06 - Reservation status - E2E", () => {
           `[data-reservation-id-status="${reservation.reservation_id}"]`
         )
       ).toBeNull();
+      
     });
   });
 });

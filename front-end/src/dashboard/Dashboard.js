@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { listReservations, updateReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, next } from "../utils/date-time";
@@ -15,7 +15,11 @@ import ListTables from "./ListTables";
 function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-console.log(reservations)
+  const history = useHistory();
+  const queryParams = useQuery();
+  const queryDate = queryParams.get("date");
+  if (queryDate) date = queryDate;
+
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
@@ -27,10 +31,6 @@ console.log(reservations)
     return () => abortController.abort();
   }
 
-  const queryParams = useQuery();
-  const queryDate = queryParams.get("date");
-  if (queryDate) date = queryDate;
-
   async function cancelHandler(e) {
     const { value } = e.target;
     const reservation = reservations.find(
@@ -39,11 +39,14 @@ console.log(reservations)
     const warningMessage = window.confirm(
       "Do you want to cancel this reservation? This cannot be undone."
     );
+    reservation.status = "cancelled";
     if (warningMessage) {
-      reservation.status = "cancelled";
-      await updateReservation(reservation)
-        .then(setReservations([...reservations]))
-        .catch(setReservationsError);
+      try {
+        await updateReservation(reservation);
+        history.push(`/reservations?date=${reservation.reservation_date}`);
+      } catch (error) {
+        setReservationsError(error);
+      }
     }
   }
 
@@ -75,22 +78,23 @@ console.log(reservations)
                   >
                     Options
                   </button>
-                <div
-                 className="dropdown-menu"
-                aria-labelledby="dropdownMenuButton"
-                >
-                  <Link
-                    className="dropdown-item"
-                    to={`/reservations/${reservation.reservation_id}/seat`}
+                  <div
+                    className="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
                   >
-                    Seat
-                  </Link>
-                  <Link
-                    className="dropdown-item"
-                    to={`/reservations/${reservation.reservation_id}/edit`}
-                  >
-                    Edit
-                  </Link>
+                    <Link
+                      className="dropdown-item"
+                      to={`/reservations/${reservation.reservation_id}/seat`}
+                    >
+                      Seat
+                    </Link>
+                    <Link
+                      className="dropdown-item"
+                      to={`/reservations/${reservation.reservation_id}/edit`}
+                    >
+                      Edit
+                    </Link>
+                  </div>
                   <button
                     className="dropdown-item"
                     onClick={cancelHandler}
@@ -100,7 +104,6 @@ console.log(reservations)
                   >
                     Cancel
                   </button>
-                </div>
                 </div>
               </>
             ) : (
@@ -116,48 +119,76 @@ console.log(reservations)
 
   return (
     <>
-    {/* <div className="row" id="headerRow"> */}
+      {/* <div className="row" id="headerRow"> */}
       <div className="row m-3 " id="dashboardHeader">
-        <div className=" col-lg-7 col-xl-9 col-md-4 col-sm-6 col-12"><h1 className="mr-2" id="dashBoardTitle">Dashboard</h1></div>
-        <div className="col-md-4 col-sm-6 col-12" id="dashDate" ><h1>{date}</h1></div>
-        <div className=" col-lg-5 col-xl-3 col-md-4" id="buttons">
-          <a href={`/dashboard?date=${previous(date)}`}>
-          <button type="button" className="btn btn-secondary mr-1">
-            Previous
-          </button>
-        </a>
-        <a href={"/"}>
-          <button type="button" className="btn btn-success mr-1">
-            Today
-          </button>
-        </a>
-        <a href={`/dashboard?date=${next(date)}`}>
-          <button type="button" className="btn btn-primary ">
-            Next
-          </button>
-        </a>
+        <div className=" col-lg-7 col-xl-8 col-md-3 col-sm-6 col-12">
+          <h1 className="mr-2" id="dashBoardTitle">
+            Dashboard
+          </h1>
+        </div>
+        <div className="col-md-4 col-sm-6 col-12" id="dashDate">
+          <h1>{date}</h1>
+        </div>
+        <div className=" col-lg-5 col-xl-4 col-md-5" id="buttons">
+          <Link to={`/dashboard?date=${previous(date)}`}>
+            <button type="button" className="btn btn-secondary mr-1">
+              Previous
+            </button>
+          </Link>
+          <Link to={"/"}>
+            <button type="button" className="btn btn-success mr-1">
+              Today
+            </button>
+          </Link>
+          <Link to={`/dashboard?date=${next(date)}`}>
+            <button type="button" className="btn btn-primary ">
+              Next
+            </button>
+          </Link>
         </div>
       </div>
-    {/* </div> */}
-      
+      {/* </div> */}
 
       <main>
         <ErrorAlert error={reservationsError} />
-        <button className="btn btn-secondary" type="button" data-toggle="collapse" id="showReservations" data-target="#reservations" aria-expanded="false" aria-controls="collapseExample">
-    Reservations
-  </button>{" "}
-  <button className="btn btn-secondary" type="button" data-toggle="collapse" data-target="#tables" id="showTables" aria-expanded="false" aria-controls="collapseExample">
-    Tables
-  </button>
+        <button
+          className="btn btn-secondary"
+          type="button"
+          data-toggle="collapse"
+          id="showReservations"
+          data-target="#reservations"
+          aria-expanded="false"
+          aria-controls="collapseExample"
+        >
+          Reservations
+        </button>{" "}
+        <button
+          className="btn btn-secondary"
+          type="button"
+          data-toggle="collapse"
+          data-target="#tables"
+          id="showTables"
+          aria-expanded="false"
+          aria-controls="collapseExample"
+        >
+          Tables
+        </button>
         <div className="row m-3" style={{ justifyContent: "space-between" }}>
-          <div className="col-lg-7 col-xl-8 col-sm-12 col-12 pt-3 collapse" id="reservations">
+          <div
+            className="col-lg-7 col-xl-8 col-sm-12 col-12 pt-3 collapse"
+            id="reservations"
+          >
             <h4 className="text-center mb-3">Reservations for {date}</h4>
-            
-            {!reservations.some((reservation) => reservation.status === "booked" || reservation.status === "seated") ? (
+
+            {!reservations.some(
+              (reservation) =>
+                reservation.status === "booked" ||
+                reservation.status === "seated"
+            ) ? (
               <p>No reservations for this day.</p>
-              ) : (
-                <table className="table table-responsive-xl border">
-                <thead >
+            ) : (
+              <table className="table table-responsive-xl border">
+                <thead>
                   <tr>
                     <th scope="col">First</th>
                     <th scope="col">Last </th>
@@ -173,8 +204,12 @@ console.log(reservations)
               </table>
             )}
           </div>
-          <div className="col-lg-3 col-xl-4 col-sm-12 col-12 pt-3 collapse" id="tables" style={{ width: "100%" }}>
-            <h3 className="text-center mb-3">Tables</h3>
+          <div
+            className="col-lg-5 col-xl-4 col-sm-12 col-12 pt-3 collapse"
+            id="tables"
+            style={{ width: "100%" }}
+          >
+            <h4 className="text-center mb-3">Tables</h4>
             <ListTables
               reservations={reservations}
               setReservations={setReservations}

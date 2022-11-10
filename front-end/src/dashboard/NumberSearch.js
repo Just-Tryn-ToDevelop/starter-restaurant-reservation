@@ -24,7 +24,7 @@ function NumberSearch() {
     }));
   }
 
-  function cancelHandler(e) {
+  async function cancelHandler(e) {
     const { value } = e.target;
     const reservation = reservations.find(
       (reservation) => reservation.reservation_id === Number(value)
@@ -35,9 +35,12 @@ function NumberSearch() {
 
     if (warningMessage) {
       reservation.status = "cancelled";
-      updateReservation(reservation)
-            .then(setReservations([...reservations]))
-        .catch(setNumberError);
+      try {
+        await updateReservation(reservation);
+        setReservations([...reservations]);
+      } catch (error) {
+        setNumberError(error);
+      }
     }
   }
 
@@ -128,23 +131,26 @@ function NumberSearch() {
                   <p>No reservations found</p>
                 ) : (
                   <>
-                  <div className="row m-3" style={{ justifyContent: "center" }}>
-            <div className="col-md-9 col-12  pt-3"></div>
-                    <table className="table table-responsive-xl">
-                      <thead className="border table-dark">
-                        <tr>
-                          <th>First</th>
-                          <th>Last</th>
-                          <th>Mobile</th>
-                          <th>Date</th>
-                          <th>Time</th>
-                          <th>People</th>
-                          <th>Status</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>{searchResults}</tbody>
-                    </table>
+                    <div
+                      className="row m-3"
+                      style={{ justifyContent: "center" }}
+                    >
+                      <div className="col-md-9 col-12  pt-3"></div>
+                      <table className="table table-responsive-xl">
+                        <thead className="border table-dark">
+                          <tr>
+                            <th>First</th>
+                            <th>Last</th>
+                            <th>Mobile</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>People</th>
+                            <th>Status</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>{searchResults}</tbody>
+                      </table>
                     </div>
                   </>
                 )

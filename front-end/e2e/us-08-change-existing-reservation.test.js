@@ -75,7 +75,7 @@ describe("US-08 - Change an existing reservation - E2E", () => {
           path: ".screenshots/us-08-cancel-reservation-before.png",
           fullPage: true,
         });
-
+       
         const cancelButtonSelector = `[data-reservation-id-cancel="${reservation.reservation_id}"]`;
 
         const cancelButton = await page.$(cancelButtonSelector);
@@ -102,6 +102,7 @@ describe("US-08 - Change an existing reservation - E2E", () => {
         await page.waitForTimeout(500);
 
         expect(await page.$(cancelButtonSelector)).toBeNull();
+        console.log("line: 107 00000")
       });
       test("then clicking cancel makes no changes", async () => {
         await page.screenshot({

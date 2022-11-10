@@ -7,7 +7,7 @@ import { updateTable } from "../utils/api";
 function Seat() {
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
-  const [foundTableId, setFoundTableId] = useState("")
+  const [foundTableId, setFoundTableId] = useState("");
   const history = useHistory();
   const { reservation_id } = useParams();
 
@@ -19,7 +19,7 @@ function Seat() {
 
   function changeHandler(e) {
     const { value } = e.target;
-    setFoundTableId(value)
+    setFoundTableId(value);
   }
 
   async function submitHandler(e) {
@@ -30,11 +30,12 @@ function Seat() {
     if (foundTable) {
       foundTable.reservation_id = reservation_id;
     }
-    await updateTable(foundTable)
-      .then(() => {
-        history.push("/");
-      })
-      .catch(setTablesError);
+    try {
+      await updateTable(foundTable);
+      await history.push("/");
+    } catch (error) {
+      setTablesError(error);
+    }
   }
 
   return (
@@ -52,11 +53,11 @@ function Seat() {
             className="custom-select"
             name="table_id"
             onChange={changeHandler}
-            value = {foundTableId}
+            value={foundTableId}
           >
             <option>Choose a table......</option>
             {tables.map((table) => (
-              <option key={table.table_id} >
+              <option key={table.table_id}>
                 {table.table_name} - {table.capacity}
               </option>
             ))}

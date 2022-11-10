@@ -174,7 +174,12 @@ async function destroy(req, res, next) {
   };
   await reservationsService.updateReservation(updatedReservation);
 
-  const data = await tableService.deleteTable(table.table_id);
+  const updatedTable = {
+    table_id: table.table_id,
+    reservation_id: null,
+  };
+
+  const data = await tableService.updateTable(updatedTable)
 
   res.status(200).json({ data });
 }

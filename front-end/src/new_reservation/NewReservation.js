@@ -47,13 +47,14 @@ function NewReservation() {
     )}-${phoneNumber.slice(6, 10)}`;
   }
 
-  function submitHandler(event) {
+  async function submitHandler(event) {
     event.preventDefault();
-    createReservation(formData)
-      .then(() => {
-        history.push(`/dashboard?date=${formData.reservation_date}`);
-      })
-      .catch(setCreateError);
+    try {
+      await createReservation(formData);
+      await history.push(`/dashboard?date=${formData.reservation_date}`);
+    } catch (error) {
+      setCreateError(error);
+    }
   }
   return (
     <>

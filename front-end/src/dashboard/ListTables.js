@@ -1,51 +1,35 @@
 import React, { useEffect, useState } from "react";
 import ErrorAlert from "../layout/ErrorAlert";
-import {
-  listTables,
-  deleteTable,
-  listReservations,
-  createTable,
-} from "../utils/api";
+import { useHistory } from "react-router-dom";
+import { listTables, deleteTable, listReservations } from "../utils/api";
 
 function ListTables({ reservations, setReservations, date }) {
-  const [tables, setTables] = useState([]);
+  let [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
-  const [table, setTable] = useState({})
+
   useEffect(() => {
     const abortController = new AbortController();
     listTables(abortController.signal).then(setTables).catch(setTablesError);
     return () => abortController.abort();
-  }, [table.table_id]);
-  
+  }, []);
+
   async function clickHandler(e) {
     const { value } = e.target;
     const tableEntry = tables.find((table) => table.table_id === Number(value));
-    const reservation = reservations.find(
-      (res) => res.reservation_id === tableEntry.reservation_id
-      );
-      setTable(tableEntry)
-      if (!reservation) throw new Error("No reservation found");
-      if (!tableEntry) throw new Error("No table found");
-      if (reservation) reservation.status = "finished";
-      const newTable = {
-        table_name: tableEntry.table_name,
-        capacity: tableEntry.capacity,
-      };
-      
-      const warningMessage = window.confirm(
-        "Is this table ready to seat new guests? This cannot be undone."
-        );
-       
-        if (warningMessage) {
-          await deleteTable(tableEntry.table_id);
-          await listReservations({ date }).then(setReservations)
-          await createTable(newTable).then((table) => {
-            const index = tables.indexOf(tableEntry)
-            tables.splice(index, 1, table)
-            setTables(tables)
-          })
-          .catch(setTablesError)
-        }
+
+    const warningMessage = window.confirm(
+      "Is this table ready to seat new guests?"
+    );
+    if (warningMessage) {
+      try {
+        await deleteTable(tableEntry.table_id);
+      tables = await listTables();
+      await setTables(tables);
+      reservations = await listReservations({ date });
+      await setReservations(reservations);
+    } catch (error) {setTablesError(error)}
+
+    }
   }
 
   const tablesList = tables.map((table) => {
@@ -55,8 +39,8 @@ function ListTables({ reservations, setReservations, date }) {
         <td>{table.capacity}</td>
         {!table.reservation_id ? (
           <>
-          <td data-table-id-status={table.table_id}>Free</td>
-          <td></td>
+            <td data-table-id-status={table.table_id}>Free</td>
+            <td></td>
           </>
         ) : (
           <>

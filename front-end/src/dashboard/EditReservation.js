@@ -57,11 +57,12 @@ function EditReservation() {
 
   async function submitHandler(event) {
     event.preventDefault();
-    await editReservation(formData)
-      .then(() => {
-        history.push(`/dashboard?date=${formData.reservation_date}`);
-      })
-      .catch(setCreateError);
+    try {
+      await editReservation(formData);
+      await history.push(`/dashboard?date=${formData.reservation_date}`);
+    } catch (error) {
+      setCreateError(error);
+    }
   }
 
   return (
