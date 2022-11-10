@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ErrorAlert from "../layout/ErrorAlert";
-import { useHistory } from "react-router-dom";
 import { listTables, deleteTable, listReservations } from "../utils/api";
 
 function ListTables({ reservations, setReservations, date }) {
