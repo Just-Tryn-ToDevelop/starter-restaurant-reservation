@@ -9,7 +9,6 @@ router
   .all(methodNotAllowed);
 router
   .route("/:table_id/seat")
-  .post(controller.createTable)
   .delete(controller.delete)
   .put(controller.update)
   .all(methodNotAllowed);

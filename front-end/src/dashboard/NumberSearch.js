@@ -137,7 +137,7 @@ function NumberSearch() {
                     >
                       <div className="col-md-9 col-12  pt-3"></div>
                       <table className="table table-responsive-xl">
-                        <thead className="border table-dark">
+                        <thead className="border">
                           <tr>
                             <th>First</th>
                             <th>Last</th>

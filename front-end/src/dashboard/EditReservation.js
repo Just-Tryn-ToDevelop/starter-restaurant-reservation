@@ -67,6 +67,9 @@ function EditReservation() {
 
   return (
     <>
+      <div className="pl-3 ">
+        <h1>Edit Reservation</h1>
+      </div>
       <ErrorAlert error={createError} />
       <ReservationForm
         editSubmitHandler={submitHandler}

@@ -206,12 +206,6 @@ module.exports = {
     asyncErrorBoundary(create),
   ],
   validateReservationExists,
-  createTable: [
-    hasRequiredPorperties,
-    validTableNameLength,
-    validCapacityNumber,
-    asyncErrorBoundary(create),
-  ],
   delete: [
     asyncErrorBoundary(validateTableExists),
     validateIfOccupiedForDelete,
