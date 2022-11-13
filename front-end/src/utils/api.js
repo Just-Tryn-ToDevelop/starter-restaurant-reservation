@@ -7,7 +7,7 @@ import formatReservationTime from "./format-reservation-time";
 
 const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
-  "https://restaurant-app-capstone-back.herokuapp.com";
+  "https://restaurant-app-capstone-backend.onrender.com";
 
 //
 
