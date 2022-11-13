@@ -1,6 +1,6 @@
 # Capstone: Restaurant Reservation System
 
-Link to live application: https://restaurant-app-capstone-front.herokuapp.com/
+Link to live application: [Restaurant Reservation App](https://restaurant-app-capstone-frontend.onrender.com)
 
 Restaurant Reservation System is an app for for managing and creating reservations, table occupancy and tables. 
 
